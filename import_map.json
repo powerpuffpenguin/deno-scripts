@@ -1,0 +1,6 @@
+{
+    "imports": {
+        "std/": "https://deno.land/std@0.165.0/",
+        "easyts/":"https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.16/deno/"
+    }
+}

@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+      "checkJs": true
+    },
+    "importMap": "import_map.json", 
+    "tasks": {
+      "run": "deno run --lock-write bin/main.ts",
+      "test": "deno test --lock-write --fail-fast",
+      "bench": "deno bench --lock-write bin/main.ts",
+      "cache": "deno cache --lock-write bin/main.ts",
+      "reload": "deno cache --reload --lock-write bin/main.ts"
+    }
+  }

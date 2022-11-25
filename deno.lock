@@ -1,0 +1,15 @@
+{
+  "version": "2",
+  "remote": {
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.16/deno/core.ts": "647204576e718e52f320b2865e2e93acb890967e46bdead59ecca5383e137e60",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.16/deno/core/channel.ts": "20b599763659b0b6c7c59746b0be25785e5471d198a5873c77ab11c5013cbe9c",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.16/deno/core/completer.ts": "9796e4948cfd65f346905251d094bbc0cac3a2a88e0faadb4e6f1a66b6b2af89",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.16/deno/core/defer.ts": "33f84274219f401e7f06b9a3abae2d2796b1638ae474fdfb41539fd8d75fdae3",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.16/deno/core/exception.ts": "8ab9550217bfed7df2899a482a778ee17175c9ab385a8007296be620b9ca510e",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.16/deno/core/signals.ts": "5b4e4b7648353e33d16943af89e11eb558ad41208e76ac94a6f1aa2edc0423fe",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.16/deno/core/signals_combiners.ts": "390b863b4efd70d9078952dca91f32121b7d02ad9873420760ea250033625fe3",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.16/deno/core/slice.ts": "970be604a72d77ccfc5b43f83d65816afe97f2027e28b6f4ce335c85892e1ba5",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.16/deno/core/types.ts": "78e43db83b91177a0dac574073730d049e5c99a6b3d3ff011bcccd3ae88e5337",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.16/deno/core/values.ts": "5edd0d484113a5ca81fb1494fac5baa3aaf12295df5d7cab935f258e03045c75"
+  }
+}
