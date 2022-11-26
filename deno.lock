@@ -1,10 +1,33 @@
 {
   "version": "2",
   "remote": {
+    "https://deno.land/std@0.165.0/_util/asserts.ts": "d0844e9b62510f89ce1f9878b046f6a57bf88f208a10304aab50efcb48365272",
+    "https://deno.land/std@0.165.0/bytes/bytes_list.ts": "aba5e2369e77d426b10af1de0dcc4531acecec27f9b9056f4f7bfbf8ac147ab4",
+    "https://deno.land/std@0.165.0/bytes/equals.ts": "3c3558c3ae85526f84510aa2b48ab2ad7bdd899e2e0f5b7a8ffc85acb3a6043a",
+    "https://deno.land/std@0.165.0/bytes/mod.ts": "b2e342fd3669176a27a4e15061e9d588b89c1aaf5008ab71766e23669565d179",
     "https://deno.land/std@0.165.0/fmt/colors.ts": "9e36a716611dcd2e4865adea9c4bec916b5c60caad4cdcdc630d4974e6bb8bd4",
+    "https://deno.land/std@0.165.0/fs/exists.ts": "6a447912e49eb79cc640adacfbf4b0baf8e17ede6d5bed057062ce33c4fa0d68",
+    "https://deno.land/std@0.165.0/io/buffer.ts": "245f1762a949082ddc0a6e9b15589d0be2d29c150266decd04320b8a8318f9f6",
+    "https://deno.land/std@0.165.0/io/types.d.ts": "107e1e64834c5ba917c783f446b407d33432c5d612c4b3430df64fc2b4ecf091",
+    "https://deno.land/std@0.165.0/log/handlers.ts": "61ab932822ba268ad42b25de6f0014892fe469df7627b14245ad32db6fd8b54d",
+    "https://deno.land/std@0.165.0/log/levels.ts": "82c965b90f763b5313e7595d4ba78d5095a13646d18430ebaf547526131604d1",
+    "https://deno.land/std@0.165.0/log/logger.ts": "b545159727b023825ee6814d9178fb2a7472f8d95d704c253b771b95c658cf8c",
+    "https://deno.land/std@0.165.0/log/mod.ts": "90618a3fdbb4520ed4e7d960665322a3dbfc107eebb3345fe0f36c8c8a7b7962",
     "https://deno.land/std@0.165.0/testing/_diff.ts": "a23e7fc2b4d8daa3e158fa06856bedf5334ce2a2831e8bf9e509717f455adb2c",
     "https://deno.land/std@0.165.0/testing/_format.ts": "cd11136e1797791045e639e9f0f4640d5b4166148796cad37e6ef75f7d7f3832",
     "https://deno.land/std@0.165.0/testing/asserts.ts": "1e340c589853e82e0807629ba31a43c84ebdcdeca910c4a9705715dfdb0f5ce8",
-    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.16/deno/core/exception.ts": "8ab9550217bfed7df2899a482a778ee17175c9ab385a8007296be620b9ca510e"
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.16/deno/core/exception.ts": "8ab9550217bfed7df2899a482a778ee17175c9ab385a8007296be620b9ca510e",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.17/deno/core.ts": "647204576e718e52f320b2865e2e93acb890967e46bdead59ecca5383e137e60",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.17/deno/core/channel.ts": "20b599763659b0b6c7c59746b0be25785e5471d198a5873c77ab11c5013cbe9c",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.17/deno/core/completer.ts": "9796e4948cfd65f346905251d094bbc0cac3a2a88e0faadb4e6f1a66b6b2af89",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.17/deno/core/defer.ts": "33f84274219f401e7f06b9a3abae2d2796b1638ae474fdfb41539fd8d75fdae3",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.17/deno/core/exception.ts": "8ab9550217bfed7df2899a482a778ee17175c9ab385a8007296be620b9ca510e",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.17/deno/core/signals.ts": "5b4e4b7648353e33d16943af89e11eb558ad41208e76ac94a6f1aa2edc0423fe",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.17/deno/core/signals_combiners.ts": "390b863b4efd70d9078952dca91f32121b7d02ad9873420760ea250033625fe3",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.17/deno/core/slice.ts": "970be604a72d77ccfc5b43f83d65816afe97f2027e28b6f4ce335c85892e1ba5",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.17/deno/core/types.ts": "78e43db83b91177a0dac574073730d049e5c99a6b3d3ff011bcccd3ae88e5337",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.17/deno/core/values.ts": "5edd0d484113a5ca81fb1494fac5baa3aaf12295df5d7cab935f258e03045c75",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.17/deno/net/url.ts": "b826848e20aac3f2a2a0aa8a8eb4efeb339abe09825fa1fe60700e1aa6c0ec25",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.17/deno/net/url/url.ts": "32fb7dca413dd33b7d5ebfa90ee951b241fdb5210bdd05b30f9adcbce5b47725"
   }
 }

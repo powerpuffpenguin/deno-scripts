@@ -32,6 +32,8 @@ Deno.test("parser", () => {
   let vals = [5, true, true];
   new Parser(createRoot(vals)).parse(["-vn", "5"]);
   new Parser(createRoot(vals)).parse(["-vn=5"]);
+  new Parser(createRoot(vals)).parse(["-vn5"]);
+
   vals = [6, false, false];
   new Parser(createRoot(vals)).parse(["--number", "6", "-d", "false"]);
   new Parser(createRoot(vals)).parse(["--number", "6", "-d=false"]);

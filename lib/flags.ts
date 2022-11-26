@@ -117,10 +117,18 @@ export class Command {
   flags(): Flags {
     return this.flags_;
   }
-  parse(args: Array<string>) {
-    this._parse(args, 0, args.length);
+  parse(args: Array<string>, opts?: ParserOptions) {
+    if (opts === undefined) {
+      opts = {};
+    }
+    this._parse(args, 0, args.length, opts);
   }
-  private _parse(args: Array<string>, start: number, end: number) {
+  private _parse(
+    args: Array<string>,
+    start: number,
+    end: number,
+    opts: ParserOptions,
+  ) {
     // 重置解析狀態，以免多次解析緩存了上次的解析結果
     this.args.splice(0);
     const flags = this.flags();
@@ -138,6 +146,9 @@ export class Command {
     for (let i = start; i < end; i++) {
       const arg = args[i];
       if (arg == "-" || arg == "--") {
+        if (opts.unknowFlags) {
+          continue;
+        }
         throw new FlagsException(
           `unknown flag in ${flags.use}: ${arg}`,
         );
@@ -162,7 +173,7 @@ export class Command {
             continue;
           }
 
-          i += this._parseLong(flags, arg.substring(2), val);
+          i += this._parseLong(flags, arg.substring(2), val, opts);
         } else {
           // 解析短參數
           if (arg == "-h") {
@@ -175,7 +186,7 @@ export class Command {
             continue;
           }
 
-          const h = this._parseShort(flags, arg.substring(1), val);
+          const h = this._parseShort(flags, arg.substring(1), val, opts);
           if (h == -1) { //help
             this._print();
             return;
@@ -185,9 +196,12 @@ export class Command {
       } else if (children) { // 解析子命令
         const sub = children.get(arg);
         if (sub) {
-          sub._parse(args, i + 1, end);
+          sub._parse(args, i + 1, end, opts);
           return;
         } else {
+          if (opts.unknowCommand) {
+            return;
+          }
           throw new FlagsException(`unknow commnad <${arg}>`);
         }
       } else { // 沒有子命令才允許傳入 args
@@ -240,16 +254,23 @@ export class Command {
       `invalid flag value in ${flags.use}: ${arg}${val}`,
     );
   }
-  private _parseShortOne(flags: Flags, arg: string, val?: string): number {
+  private _parseShortOne(
+    flags: Flags,
+    arg: string,
+    val: string | undefined,
+    opts: ParserOptions,
+  ): number {
     if (arg == "h") {
       return this._parseHelp(flags, `-${arg}`, val);
     }
     const flag = flags.find(arg, true);
     if (!flag) {
+      if (opts.unknowFlags) {
+        return 1;
+      }
       throw new FlagsException(
         `unknown flag in ${flags.use}: -${arg}`,
       );
-      // return 1;
     }
     if (flag.isBool()) {
       if (val !== "false" && val !== "true") {
@@ -261,17 +282,24 @@ export class Command {
     }
     this._throw(flags, flag, `-${arg}`, val);
   }
-  private _parseShort2(flags: Flags, arg: string, val: string): number {
+  private _parseShort2(
+    flags: Flags,
+    arg: string,
+    val: string,
+    opts: ParserOptions,
+  ): number {
     if (arg == "h") {
       const v = this._parseHelp(flags, "-h", val);
       return v == -1 ? v : 0;
     }
     const flag = flags.find(arg, true);
     if (!flag) {
+      if (opts.unknowFlags) {
+        return 0;
+      }
       throw new FlagsException(
         `unknown flag in ${flags.use}: -${arg}`,
       );
-      // return 0;
     }
     if (flag.add(val)) {
       return 0;
@@ -281,33 +309,37 @@ export class Command {
   private _parseShort(
     flags: Flags,
     arg: string,
-    nextVal?: string,
+    nextVal: string | undefined,
+    opts: ParserOptions,
   ): number {
     switch (arg.length) {
       case 0:
+        if (opts.unknowFlags) {
+          return 0;
+        }
         throw new FlagsException(
           `unknown flag in ${flags.use}: -${arg}`,
         );
       case 1:
-        return this._parseShortOne(flags, arg, nextVal);
+        return this._parseShortOne(flags, arg, nextVal, opts);
     }
     if (arg[1] == "=") {
-      return this._parseShort2(flags, arg[0], arg.substring(2));
+      return this._parseShort2(flags, arg[0], arg.substring(2), opts);
     }
     const name = arg[0];
     const flag = flags.find(name, true);
     if (!flag) {
+      if (opts.unknowFlags) {
+        return 0;
+      }
       throw new FlagsException(
         `unknown flag in ${flags.use}: -${name}`,
       );
-      // return 0;
     } else if (!flag.isBool()) {
-      throw new FlagsException(
-        `flag in ${flags.use} needs an argument: ${name}`,
-      );
+      return this._parseShort2(flags, arg[0], arg.substring(1), opts);
     }
     if (flag.add(undefined)) {
-      return this._parseShort(flags, arg.substring(1), nextVal);
+      return this._parseShort(flags, arg.substring(1), nextVal, opts);
     }
     throw new FlagsException(
       `invalid flag value in ${flags.use}: ${name}`,
@@ -316,7 +348,8 @@ export class Command {
   private _parseLong(
     flags: Flags,
     arg: string,
-    val?: string,
+    val: string | undefined,
+    opts: ParserOptions,
   ): number {
     const found = arg.indexOf("=");
     let name: string;
@@ -331,10 +364,12 @@ export class Command {
 
     const flag = flags.find(name);
     if (!flag) {
+      if (opts.unknowFlags) {
+        return next ? 1 : 0;
+      }
       throw new FlagsException(
         `unknown flag in ${flags.use}: --${name}`,
       );
-      // return next ? 1 : 0;
     }
     if (next && flag.isBool()) {
       if (val !== "false" && val !== "true") {
@@ -348,6 +383,9 @@ export class Command {
     this._throw(flags, flag, `--${name}`, val);
   }
   private _print() {
+    console.log(this.toString());
+  }
+  toString(): string {
     const opts = this.opts;
     const use = this.flags().use;
     const strs = new Array<string>();
@@ -437,7 +475,10 @@ Available Commands:`);
         `\nUse "${use} [command] --help" for more information about a command.`,
       );
     }
-    console.log(strs.join("\n"));
+    return strs.join("\n");
+  }
+  print() {
+    console.log(this.toString());
   }
 }
 /**
@@ -526,48 +567,77 @@ export class Flags implements Iterable<FlagDefine<any>> {
       kl.set(name, f);
     }
   }
-  string(opts: FlagOptions<string>): FlagString {
+  string(opts: FlagOptionsLike<string>): FlagString {
     const f = new FlagString(opts);
     this.add(f);
     return f;
   }
-  strings(opts: FlagOptions<Array<string>>): FlagStrings {
+  strings(opts: FlagOptionsLike<Array<string>>): FlagStrings {
     const f = new FlagStrings(opts);
     this.add(f);
     return f;
   }
-  number(opts: FlagOptions<number>): FlagNumber {
+  number(opts: FlagOptionsLike<number>): FlagNumber {
     const f = new FlagNumber(opts);
     this.add(f);
     return f;
   }
-  numbers(opts: FlagOptions<Array<number>>): FlagNumbers {
+  numbers(opts: FlagOptionsLike<Array<number>>): FlagNumbers {
     const f = new FlagNumbers(opts);
     this.add(f);
     return f;
   }
-  bigint(opts: FlagOptions<bigint>): FlagBigint {
+  bigint(opts: FlagOptionsLike<bigint>): FlagBigint {
     const f = new FlagBigint(opts);
     this.add(f);
     return f;
   }
-  bigints(opts: FlagOptions<Array<bigint>>): FlagBigints {
+  bigints(opts: FlagOptionsLike<Array<bigint>>): FlagBigints {
     const f = new FlagBigints(opts);
     this.add(f);
     return f;
   }
-  bool(opts: FlagOptions<boolean>): FlagBoolean {
+  bool(opts: FlagOptionsLike<boolean>): FlagBoolean {
     const f = new FlagBoolean(opts);
     this.add(f);
     return f;
   }
-  bools(opts: FlagOptions<Array<boolean>>): FlagBooleans {
+  bools(opts: FlagOptionsLike<Array<boolean>>): FlagBooleans {
     const f = new FlagBooleans(opts);
     this.add(f);
     return f;
   }
 }
-
+export interface FlagOptionsLike<T> {
+  /**
+   * 參數名稱 {@link matchUse}
+   */
+  readonly name: string;
+  /**
+   * 未指定參數時的默認值
+   */
+  readonly default?: T;
+  /**
+   * 可選的參數短名稱
+   */
+  readonly short?: string;
+  /**
+   * 可選的參數用法描述
+   */
+  readonly usage?: string;
+  /**
+   * 可選的參數有效值列表
+   * @remarks
+   * 如果同時設定了 isValid,當 values 不匹配時才會調用 isValid進行驗證，如果 values 匹配則直接任務值有效不會調用 isValid
+   */
+  readonly values?: Array<T>;
+  /**
+   * 可選的參數驗證函數
+   * @remarks
+   * 如果同時設定了 isValid,當 values 不匹配時才會調用 isValid進行驗證，如果 values 匹配則直接任務值有效不會調用 isValid
+   */
+  readonly isValid?: (v: T) => boolean;
+}
 export interface FlagOptions<T> {
   /**
    * 參數名稱 {@link matchUse}
@@ -758,7 +828,27 @@ class FlagBase<T> implements FlagDefine<T> {
     return false;
   }
 }
+
+function formatFlagOptions<T>(
+  opts: FlagOptionsLike<T>,
+  def: T,
+): FlagOptions<T> {
+  if (opts.default !== undefined) {
+    return opts as any;
+  }
+  return {
+    name: opts.name,
+    default: def,
+    short: opts.short,
+    usage: opts.usage,
+    values: opts.values,
+    isValid: opts.isValid,
+  };
+}
 export class FlagString extends FlagBase<string> {
+  constructor(opts: FlagOptionsLike<string>) {
+    super(formatFlagOptions(opts, ""));
+  }
   /**
    * @override
    */
@@ -771,6 +861,9 @@ export class FlagString extends FlagBase<string> {
   }
 }
 export class FlagStrings extends FlagBase<Array<string>> {
+  constructor(opts: FlagOptionsLike<Array<string>>) {
+    super(formatFlagOptions(opts, []));
+  }
   /**
    * @override
    */
@@ -783,6 +876,9 @@ export class FlagStrings extends FlagBase<Array<string>> {
   }
 }
 export class FlagNumber extends FlagBase<number> {
+  constructor(opts: FlagOptionsLike<number>) {
+    super(formatFlagOptions(opts, 0));
+  }
   /**
    * @override
    */
@@ -799,6 +895,9 @@ export class FlagNumber extends FlagBase<number> {
   }
 }
 export class FlagNumbers extends FlagBase<Array<number>> {
+  constructor(opts: FlagOptionsLike<Array<number>>) {
+    super(formatFlagOptions(opts, []));
+  }
   /**
    * @override
    */
@@ -815,6 +914,9 @@ export class FlagNumbers extends FlagBase<Array<number>> {
   }
 }
 export class FlagBigint extends FlagBase<bigint> {
+  constructor(opts: FlagOptionsLike<bigint>) {
+    super(formatFlagOptions(opts, BigInt(0)));
+  }
   /**
    * @override
    */
@@ -835,6 +937,9 @@ export class FlagBigint extends FlagBase<bigint> {
   }
 }
 export class FlagBigints extends FlagBase<Array<bigint>> {
+  constructor(opts: FlagOptionsLike<Array<bigint>>) {
+    super(formatFlagOptions(opts, []));
+  }
   /**
    * @override
    */
@@ -865,6 +970,9 @@ function parseBool(v?: string): boolean | undefined {
   return undefined;
 }
 export class FlagBoolean extends FlagBase<boolean> {
+  constructor(opts: FlagOptionsLike<boolean>) {
+    super(formatFlagOptions(opts, false));
+  }
   /**
    * @override
    */
@@ -884,6 +992,9 @@ export class FlagBoolean extends FlagBase<boolean> {
   }
 }
 export class FlagBooleans extends FlagBase<Array<boolean>> {
+  constructor(opts: FlagOptionsLike<Array<boolean>>) {
+    super(formatFlagOptions(opts, []));
+  }
   /**
    * @override
    */
@@ -902,7 +1013,16 @@ export class FlagBooleans extends FlagBase<Array<boolean>> {
     return true;
   }
 }
-
+export interface ParserOptions {
+  /**
+   * 是否允許未定義參數 默認爲 false
+   */
+  unknowFlags?: boolean;
+  /**
+   * 是否允許未定義子命令 默認爲 false
+   */
+  unknowCommand?: boolean;
+}
 /**
  * 命令解析器
  */
@@ -923,9 +1043,9 @@ export class Parser {
   /**
    * @param args 命令參數
    */
-  parse(args: Array<string>) {
+  parse(args: Array<string>, opts?: ParserOptions) {
     try {
-      this.root.parse(args);
+      this.root.parse(args, opts);
     } catch (e) {
       console.warn(e);
       Deno.exit(1);
