@@ -1,7 +1,7 @@
 import { Command } from "../../lib/flags.ts";
-import { log } from "../../deps/std/log.ts";
-import { Values } from "../../deps/easyts/net_url.ts";
-import { Exception } from "../../deps/easyts/core.ts";
+import * as log from "../../deps/std/log/mod.ts";
+import { Values } from "../../deps/easyts/net/url.ts";
+import { Exception } from "../../deps/easyts/core/exception.ts";
 
 class Context {
   constructor(

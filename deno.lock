@@ -16,7 +16,6 @@
     "https://deno.land/std@0.165.0/testing/_diff.ts": "a23e7fc2b4d8daa3e158fa06856bedf5334ce2a2831e8bf9e509717f455adb2c",
     "https://deno.land/std@0.165.0/testing/_format.ts": "cd11136e1797791045e639e9f0f4640d5b4166148796cad37e6ef75f7d7f3832",
     "https://deno.land/std@0.165.0/testing/asserts.ts": "1e340c589853e82e0807629ba31a43c84ebdcdeca910c4a9705715dfdb0f5ce8",
-    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.16/deno/core/exception.ts": "8ab9550217bfed7df2899a482a778ee17175c9ab385a8007296be620b9ca510e",
     "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.17/deno/core.ts": "647204576e718e52f320b2865e2e93acb890967e46bdead59ecca5383e137e60",
     "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.17/deno/core/channel.ts": "20b599763659b0b6c7c59746b0be25785e5471d198a5873c77ab11c5013cbe9c",
     "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.17/deno/core/completer.ts": "9796e4948cfd65f346905251d094bbc0cac3a2a88e0faadb4e6f1a66b6b2af89",

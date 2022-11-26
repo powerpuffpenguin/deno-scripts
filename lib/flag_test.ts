@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import { Command, Parser } from "./flags.ts";
-import { assertEquals } from "std/testing/asserts.ts";
+import { assertEquals } from "../deps/std/testing/asserts.ts";
 function createRoot(vals: Array<any>) {
   return new Command({
     use: "main",

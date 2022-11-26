@@ -1,6 +1,6 @@
 import { Command, Parser } from "../lib/flags.ts";
 import { downloadCommand } from "./piwigo/download.ts";
-import { log } from "../deps/std/log.ts";
+import * as log from "../deps/std/log/mod.ts";
 const l = log.getLogger();
 // 調整日誌輸出等級(默認爲 INFO)
 l.level = log.LogLevels.DEBUG;
