@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
-import { Exception } from "easyts/core/exception.ts";
+import { Exception } from "../deps/easyts/core.ts";
 export class FlagsException extends Exception {
   constructor(message: string) {
     super(message);

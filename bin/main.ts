@@ -1,4 +1,4 @@
-import { Chan } from "easyts/core.ts";
+import { Chan } from "../deps/easyts/core.ts";
 
 const c = new Chan<number>();
 (async () => {

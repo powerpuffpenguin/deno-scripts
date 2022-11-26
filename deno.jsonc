@@ -2,7 +2,7 @@
     "compilerOptions": {
       "checkJs": true
     },
-    "importMap": "import_map.json", 
+    // "importMap": "import_map.json", 
     "tasks": {
       "run": "deno run --lock-write bin/main.ts",
       "test": "deno test --lock-write --fail-fast",
