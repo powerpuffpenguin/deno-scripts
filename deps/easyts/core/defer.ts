@@ -1,1 +1,1 @@
-export * from "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.17/deno/core/defer.ts";
+export * from "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.18/deno/core/defer.ts";

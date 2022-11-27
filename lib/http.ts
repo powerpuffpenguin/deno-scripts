@@ -1,6 +1,7 @@
 import { Defer } from "../deps/easyts/core/defer.ts";
 import { Exception } from "../deps/easyts/core/exception.ts";
 import { DateTime } from "../deps/luxon/luxon.js";
+import { copy, readFull } from "./io.ts";
 
 async function lastModified(path: string): Promise<DateTime | undefined> {
   try {
@@ -53,16 +54,59 @@ class TemporaryFile {
       }
     }
   }
-  async dst(dst: string) {
+  dst(dst: string) {
     return Defer.async(async (d) => {
-      const r = await Deno.open(this.path);
-      d.defer(() => r.close());
-      r.read;
+      const r: Deno.FsFile | undefined = await Deno.open(this.path);
+      const rc = d.defer(() => r?.close());
+      await this._read(r);
+
+      const path = dst + ".ok";
+      const ok = await Deno.open(path, {
+        write: true,
+        truncate: true,
+        create: true,
+        mode: 0o664,
+      });
+      const okc = d.defer(() => ok.close());
+      rc.cancel();
+      await r.readable.pipeTo(ok.writable, {
+        preventClose: true,
+      });
+
+      okc.cancel();
+      ok.close();
+      await Deno.rename(path, dst);
+
+      await Deno.remove(this.path);
     });
   }
-  private async _read(r: Deno.FsFile) {
-    const size = new Uint8Array(2);
-    await r.read(size);
+  private async _read(r: Deno.FsFile): Promise<Metadata> {
+    let b = new Uint8Array(2);
+    await readFull(r, b);
+    const size = new DataView(b.buffer).getUint16(0);
+    b = new Uint8Array(size);
+    await readFull(r, b);
+    const text = new TextDecoder().decode(b);
+    const md = JSON.parse(text);
+    const m = md["m"];
+    if (typeof m !== "string") {
+      throw new Exception(`unknow medatata: ${text}`);
+    }
+    const l = md["l"];
+    if (typeof l !== "string") {
+      throw new Exception(`unknow medatata: ${text}`);
+    }
+    let dt: DateTime | undefined;
+    if (m != "") {
+      dt = DateTime.fromISO(m);
+      if (!dt.isValid) {
+        dt = undefined;
+      }
+    }
+    return {
+      length: BigInt(l),
+      lastModified: dt,
+    };
   }
 }
 class Downloader {

@@ -50,7 +50,7 @@ deps(
   ]),
   define(
     "easyts",
-    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.17/deno",
+    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.18/deno",
     [
       "core/channel.ts",
       "core/exception.ts",
