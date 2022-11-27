@@ -1,99 +1,105 @@
 import { Command } from "../../lib/flags.ts";
 import * as log from "../../deps/std/log/mod.ts";
-import { Values } from "../../deps/easyts/net/url.ts";
-import { Exception } from "../../deps/easyts/core/exception.ts";
-
+import { Client } from "./client.ts";
+import { download } from "../../lib/http.ts";
+export class ImageDownload {
+  constructor(
+    public id: number,
+    public url: string,
+    public file: string,
+  ) {}
+}
+function splitFilename(name: string): Array<string> {
+  const i = name.lastIndexOf(".");
+  if (i == -1) {
+    return [name, ""];
+  }
+  return [name.substring(0, i), name.substring(i)];
+}
+function pahtJoin(base: string, path: string): string {
+  if (Deno.build.os === "windows" && base.endsWith("\\")) {
+    return base + path;
+  } else if (base.endsWith("/")) {
+    return base + path;
+  } else {
+    return base + "/" + path;
+  }
+}
 class Context {
   constructor(
-    readonly url: URL,
-    readonly username: string,
-    readonly password: string,
-    readonly id: string,
-    readonly output: string,
-  ) {
-  }
+    public readonly client: Client,
+    public readonly id: string,
+    public readonly output: string,
+  ) {}
   async serve() {
-    let output = this.output;
-    if (Deno.build.os === "windows" && output.endsWith("\\")) {
-      output += this.id;
-    } else if (output.endsWith("/")) {
-      output += this.id;
-    } else {
-      output += "/" + this.id;
-    }
+    const output = pahtJoin(this.output, this.id);
     log.info(`download to: ${output}`);
     await Deno.mkdir(output, {
       recursive: true,
     });
-    await this._login();
-    await this._list();
-  }
-  // deno-lint-ignore no-explicit-any
-  private _checkResponse(obj: any) {
-    if (obj["stat"] != "ok") {
-      throw new Exception(JSON.stringify(obj));
+
+    // 獲取照片列表
+    const client = this.client;
+    const arrs = await this._list(client, this.id);
+
+    log.info(`find: ${arrs.length}`);
+    for (let i = 0; i < arrs.length; i++) {
+      const item = arrs[i];
+      log.info(` - ${i + 1}/${arrs.length} id=${item.id} file=${item.file}`);
+      await this._downlod(client, output, item);
     }
   }
-  async _login() {
-    const vals = Values.fromObject({
-      method: "pwg.session.login",
-      format: "json",
-    });
-    const url = `${this.url}?${vals.encode()}`;
-    const resp = await fetch(url, {
-      method: "POST",
-      body: Values.fromObject({
-        username: this.username,
-        password: this.password,
-      }).encode(),
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
-    if (resp.status != 200) {
-      throw new Exception(`${resp.status}: ${resp.statusText}`);
+  private _name(set: Set<string>, id: number, name: string): string {
+    if (!set.has(name)) {
+      set.add(name);
+      return name;
     }
-    const obj = await resp.json();
-    this._checkResponse(obj);
-    console.log(resp);
-    console.log(resp.headers.get("set-cookie"));
-    let str = resp.headers.get("set-cookie") ?? "";
-    const tag = "pwg_id=";
-    let found = str.indexOf(tag);
-    if (found == -1) {
-      throw new Exception("not found pwg_id on set-cookie");
-    }
-    str = str.substring(found + tag.length);
-    found = str.indexOf(";");
-    if (found != -1) {
-      str = str.substring(0, found);
-    }
-    this.cookie_ = `${tag}${str};`;
+    const [s, ext] = splitFilename(name);
+    return `${s}_${id}${ext}`;
   }
-  private cookie_ = "";
-  async _list() {
-    const pageCount = 100;
-    const page = 0;
-    const vals = Values.fromObject({
-      method: "pwg.categories.getImages",
-      format: "json",
-      cat_id: this.id,
-      per_page: pageCount.toString(),
-      page: page.toString(),
-      order: "id",
+  private async _list(
+    client: Client,
+    id: string,
+  ): Promise<Array<ImageDownload>> {
+    const arrs = new Array<ImageDownload>();
+    const keys = new Map<number, ImageDownload>();
+    const names = new Set<string>();
+    let page = 0;
+    const limit = 100;
+    while (true) {
+      const resp = await client.getImages(id, page++, limit);
+      const images = resp.result.images;
+      if (!Array.isArray(images) || images.length == 0) {
+        break;
+      }
+      page++;
+      for (const image of images) {
+        const name = this._name(names, image.id, image.file);
+        names.add(name);
+
+        const old = keys.get(image.id);
+        if (old) {
+          old.url = image.element_url;
+          old.file = name;
+        } else {
+          const node = new ImageDownload(
+            image.id,
+            image.element_url,
+            name,
+          );
+          arrs.push(node);
+          keys.set(image.id, node);
+        }
+      }
+    }
+    return arrs;
+  }
+  private async _downlod(client: Client, dir: string, item: ImageDownload) {
+    const cookie = await client.cookie();
+    const dst = pahtJoin(dir, item.file);
+    await download(dst, item.url, {
+      Cookie: cookie.cookie,
     });
-    const url = `${this.url}?${vals.encode()}`;
-    const resp = await fetch(url, {
-      method: "get",
-      headers: {
-        Accept: "application/json",
-        Cookie: this.cookie_,
-      },
-    });
-    const obj = await resp.json();
-    this._checkResponse(obj);
-    console.log(obj);
   }
 }
 
@@ -117,7 +123,7 @@ piwigo.ts download 1 2 3 -Uhttp://127.0.0.1:8000/ws.php -uabc -p456
       usage: "Piwigo server url",
       short: "U",
       isValid: (v) => {
-        if (!v.startsWith("http://") || v.startsWith("https://")) {
+        if (!v.startsWith("http://") && !v.startsWith("https://")) {
           return false;
         }
         try {
@@ -146,8 +152,10 @@ piwigo.ts download 1 2 3 -Uhttp://127.0.0.1:8000/ws.php -uabc -p456
       log.info(`url=${url} username=${username} password=${password}`);
       log.debug(`output=${output}`);
       log.debug(`id [${args}]`);
+      const client = new Client(url, username, password);
+
       for (const id of args) {
-        const ctx = new Context(url, username, password, id, output);
+        const ctx = new Context(client, id, output);
         await ctx.serve();
       }
     };

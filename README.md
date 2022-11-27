@@ -13,8 +13,14 @@ deno 寫的一些腳本工具
    export DURL="https://raw.githubusercontent.com/powerpuffpenguin/deno-scripts/main"
    ```
 
-2. 使用 --import-map 指定正確的依賴，和要執行的腳本
+2. 使用 deno run 運行 bin 下的腳本即可
 
    ```
-   deno run --import-map "$DURL/import_map.json" "$DURL/bin/main.ts"
+   deno run "$DURL/bin/main.ts"
    ```
+
+如果想查看腳本的詳細介紹，加上 -h 即可顯示使用說明
+
+```
+deno run "$DURL/bin/piwigo.ts" -h
+```

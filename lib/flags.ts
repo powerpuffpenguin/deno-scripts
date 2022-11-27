@@ -65,13 +65,8 @@ export class Command {
     if (short !== undefined && short.indexOf("\n") != -1) {
       throw new FlagsException(`short invalid: ${short}`);
     }
-    let parent = this.parent_;
-    let use = opts.use;
-    while (parent) {
-      use = `${parent.opts.use} ${use}`;
-      parent = parent.parent_;
-    }
-    this.flags_ = new Flags(use);
+
+    this.flags_ = new Flags(this);
   }
   /**
    * 添加子命令
@@ -106,6 +101,7 @@ export class Command {
         throw new FlagsException(`command "${key}" already exists`);
       } else {
         cmd.parent_ = this;
+        cmd.flags();
         children.set(key, cmd);
       }
     }
@@ -480,14 +476,27 @@ Available Commands:`);
   print() {
     console.log(this.toString());
   }
+  parent(): Command | undefined {
+    return this.parent_;
+  }
 }
 /**
  * 命令參數解析
  */
 export class Flags implements Iterable<FlagDefine<any>> {
   constructor(
-    public readonly use: string,
+    private cmd: Command,
   ) {}
+  get use(): string {
+    const cmd = this.cmd;
+    let parent = cmd.parent();
+    let use = cmd.opts.use;
+    while (parent) {
+      use = `${parent.opts.use} ${use}`;
+      parent = parent.parent();
+    }
+    return use;
+  }
   private short_?: Map<string, FlagDefine<any>>;
   private long_?: Map<string, FlagDefine<any>>;
   private arrs_?: Array<FlagDefine<any>>;
@@ -1044,11 +1053,6 @@ export class Parser {
    * @param args 命令參數
    */
   parse(args: Array<string>, opts?: ParserOptions) {
-    try {
-      this.root.parse(args, opts);
-    } catch (e) {
-      console.warn(e);
-      Deno.exit(1);
-    }
+    this.root.parse(args, opts);
   }
 }

@@ -54,7 +54,16 @@ deps(
     [
       "core/channel.ts",
       "core/exception.ts",
+      "core/completer.ts",
+      "core/defer.ts",
       "net/url.ts",
+    ],
+  ),
+  define(
+    "luxon",
+    "https://cdn.jsdelivr.net/npm/luxon@3.1.0/build/es6",
+    [
+      "luxon.js",
     ],
   ),
 );
