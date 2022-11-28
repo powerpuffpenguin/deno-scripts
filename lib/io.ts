@@ -121,6 +121,13 @@ export async function _copyBuffer(
   }
   if (!buf) {
     let size = 1024 * 32;
+    if (src instanceof LimitReader) {
+      if (src.n < 1) {
+        size = 1;
+      } else {
+        size = src.n;
+      }
+    }
     buf = new Uint8Array(size);
   }
 
