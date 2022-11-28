@@ -120,7 +120,10 @@ export class Client {
     return new Cookie(`${tag}${str};`, Date.now());
   }
   private completer_?: Completer<Cookie>;
-  async cookie(): Promise<Cookie> {
+  async cookie(): Promise<Cookie | undefined> {
+    if (this.username == "" || this.password == "") {
+      return;
+    }
     let cookie = this.cookie_;
     if (cookie && cookie.isValid()) {
       return cookie;
@@ -165,10 +168,14 @@ export class Client {
     const url = `${this.url}?${vals.encode()}`;
     const resp = await fetch(url, {
       method: "GET",
-      headers: {
-        Accept: "application/json",
-        Cookie: cookie.cookie,
-      },
+      headers: cookie === undefined
+        ? {
+          Accept: "application/json",
+        }
+        : {
+          Accept: "application/json",
+          Cookie: cookie?.cookie ?? "",
+        },
     });
     const obj = await resp.json() as GetImagesResponse;
     this._checkResponse(obj);

@@ -97,9 +97,12 @@ class Context {
   private async _downlod(client: Client, dir: string, item: ImageDownload) {
     const cookie = await client.cookie();
     const dst = pahtJoin(dir, item.file);
-    await download(dst, item.url, {
-      Cookie: cookie.cookie,
-    });
+
+    await (cookie === undefined
+      ? download(dst, item.url)
+      : download(dst, item.url, {
+        Cookie: cookie.cookie,
+      }));
   }
 }
 
