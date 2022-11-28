@@ -2,6 +2,8 @@ import { Command } from "../../lib/flags.ts";
 import * as log from "../../deps/std/log/mod.ts";
 import { Client } from "./client.ts";
 import { download } from "../../lib/http.ts";
+import { DateTime } from "../../deps/luxon/luxon.js";
+
 export class ImageDownload {
   constructor(
     public id: number,
@@ -157,9 +159,18 @@ piwigo.ts download 1 2 3 -Uhttp://127.0.0.1:8000/ws.php -uabc -p456
       log.debug(`id [${args}]`);
       const client = new Client(url, username, password);
 
-      for (const id of args) {
-        const ctx = new Context(client, id, output);
-        await ctx.serve();
+      const at = DateTime.now();
+      try {
+        for (const id of args) {
+          const ctx = new Context(client, id, output);
+          try {
+            await ctx.serve();
+          } finally {
+            log.info(`id=${id} used: ${DateTime.now().diff(at).toHuman()}`);
+          }
+        }
+      } finally {
+        log.info(`total used: ${DateTime.now().diff(at).toHuman()}`);
       }
     };
   },

@@ -3,7 +3,7 @@ import { Command, Parser } from "../lib/flags.ts";
 import { downloadCommand } from "./piwigo/download.ts";
 import * as log from "../deps/std/log/mod.ts";
 
-const version = "v0.0.1";
+const version = "v0.0.2";
 export const root = new Command({
   use: "piwigo.ts",
   short: "Connect to piwigo server and perform some tasks",

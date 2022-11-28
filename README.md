@@ -7,7 +7,7 @@ deno 寫的一些腳本工具
 
 index
 
-- [piwigo.ts](#piwigo.ts)
+- [piwigo.ts](#piwigots)
 
 # run scripts
 
