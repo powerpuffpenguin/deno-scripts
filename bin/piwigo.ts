@@ -1,5 +1,5 @@
 import { Environment } from "../lib/env.ts";
-import { Command, Parser } from "../lib/flags.ts";
+import { Command, Parser } from "../deps/flags/mod.ts";
 import { downloadCommand } from "./piwigo/download.ts";
 import * as log from "../deps/std/log/mod.ts";
 

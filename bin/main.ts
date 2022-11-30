@@ -1,6 +1,6 @@
 import "../lib/env_main.ts";
 import { root as piwigo } from "./piwigo.ts";
-import { Command, Parser } from "../lib/flags.ts";
+import { Command, Parser } from "../deps/flags/mod.ts";
 import * as log from "../deps/std/log/mod.ts";
 const version = "v0.0.1";
 const root = new Command({

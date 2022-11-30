@@ -60,6 +60,13 @@ deps(
     ],
   ),
   define(
+    "flags",
+    "https://deno.land/x/flags@0.0.2",
+    [
+      "mod.ts",
+    ],
+  ),
+  define(
     "luxon",
     "https://cdn.jsdelivr.net/npm/luxon@3.1.0/build/es6",
     [

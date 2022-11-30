@@ -1,4 +1,4 @@
-import { Command } from "../../lib/flags.ts";
+import { Command } from "../../deps/flags/mod.ts";
 import * as log from "../../deps/std/log/mod.ts";
 import { Client } from "./client.ts";
 import { download } from "../../lib/http.ts";
