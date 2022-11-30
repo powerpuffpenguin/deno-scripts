@@ -1,4 +1,3 @@
-import { Values } from "../../deps/easyts/net/url.ts";
 import { Exception } from "../../deps/easyts/core/exception.ts";
 import { Completer } from "../../deps/easyts/core/completer.ts";
 
@@ -84,17 +83,17 @@ export class Client {
     }
   }
   private async _login(): Promise<Cookie> {
-    const vals = Values.fromObject({
+    const vals = new URLSearchParams({
       method: "pwg.session.login",
       format: "json",
     });
-    const url = `${this.url}?${vals.encode()}`;
+    const url = `${this.url}?${vals}`;
     const resp = await fetch(url, {
       method: "POST",
-      body: Values.fromObject({
+      body: new URLSearchParams({
         username: this.username,
         password: this.password,
-      }).encode(),
+      }),
       headers: {
         Accept: "application/json",
         "Content-Type": "application/x-www-form-urlencoded",
@@ -157,7 +156,7 @@ export class Client {
     limit: number,
   ): Promise<GetImagesResponse> {
     const cookie = await this.cookie();
-    const vals = Values.fromObject({
+    const vals = new URLSearchParams({
       method: "pwg.categories.getImages",
       format: "json",
       cat_id: id,
@@ -165,7 +164,7 @@ export class Client {
       per_page: limit.toString(),
       order: "id",
     });
-    const url = `${this.url}?${vals.encode()}`;
+    const url = `${this.url}?${vals}`;
     const resp = await fetch(url, {
       method: "GET",
       headers: cookie === undefined

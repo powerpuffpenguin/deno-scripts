@@ -56,12 +56,11 @@ deps(
       "core/exception.ts",
       "core/completer.ts",
       "core/defer.ts",
-      "net/url.ts",
     ],
   ),
   define(
     "flags",
-    "https://deno.land/x/flags@0.0.2",
+    "https://deno.land/x/flags@0.0.3",
     [
       "mod.ts",
     ],

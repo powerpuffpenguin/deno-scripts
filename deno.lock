@@ -15,6 +15,7 @@
     "https://deno.land/std@0.165.0/log/logger.ts": "b545159727b023825ee6814d9178fb2a7472f8d95d704c253b771b95c658cf8c",
     "https://deno.land/std@0.165.0/log/mod.ts": "90618a3fdbb4520ed4e7d960665322a3dbfc107eebb3345fe0f36c8c8a7b7962",
     "https://deno.land/x/flags@0.0.2/mod.ts": "cd018a29ad97683ea674203c00a75144844a1f53169f923529eba70048825d9a",
+    "https://deno.land/x/flags@0.0.3/mod.ts": "cd018a29ad97683ea674203c00a75144844a1f53169f923529eba70048825d9a",
     "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.18/deno/core.ts": "647204576e718e52f320b2865e2e93acb890967e46bdead59ecca5383e137e60",
     "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.18/deno/core/channel.ts": "20b599763659b0b6c7c59746b0be25785e5471d198a5873c77ab11c5013cbe9c",
     "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.18/deno/core/completer.ts": "9796e4948cfd65f346905251d094bbc0cac3a2a88e0faadb4e6f1a66b6b2af89",
