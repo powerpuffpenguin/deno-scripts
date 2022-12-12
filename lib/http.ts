@@ -1,18 +1,16 @@
 // deno-lint-ignore-file no-explicit-any
-import { Defer } from "../deps/easyts/core/defer.ts";
-import { Exception } from "../deps/easyts/core/exception.ts";
 import { DateTime } from "../deps/luxon/luxon.js";
-import { readFull } from "./io.ts";
-
+import { readFull } from "../deps/easyts/io/mod.ts";
+import { Defer } from "../deps/easyts/defer.ts";
 function throwResponse(resp: Response, opts?: {
   text?: boolean;
 }): never | Promise<never> {
   if (opts?.text) {
     return resp.text().then((text) => {
-      throw new Exception(`${resp.status} ${resp.statusText} ${text}`);
+      throw new Error(`${resp.status} ${resp.statusText} ${text}`);
     });
   }
-  throw new Exception(`${resp.status} ${resp.statusText}`);
+  throw new Error(`${resp.status} ${resp.statusText}`);
 }
 async function statMTime(path: string): Promise<DateTime | undefined> {
   try {
@@ -47,11 +45,11 @@ async function readMetdata(name: string, r: Deno.FsFile, output?: {
   const md = JSON.parse(text);
   const m = md["m"];
   if (typeof m !== "number") {
-    throw new Exception(`unknow medatata of ${name}: ${text}`);
+    throw new Error(`unknow medatata of ${name}: ${text}`);
   }
   const l = md["l"];
   if (typeof l !== "number") {
-    throw new Exception(`unknow medatata of ${name}: ${text}`);
+    throw new Error(`unknow medatata of ${name}: ${text}`);
   }
   let dt: DateTime | undefined;
   if (m != 0) {
@@ -288,13 +286,13 @@ class Downloader {
     }
     const body = resp.body;
     if (!body) {
-      throw new Exception("body null");
+      throw new Error("body null");
     }
     const str = resp.headers.get("Last-Modified");
     const contextLength = resp.headers.get("content-length");
     const length = parseInt(contextLength ?? "0");
     if (!isFinite(length)) {
-      throw new Exception(`context-length not supported: ${contextLength}`);
+      throw new Error(`context-length not supported: ${contextLength}`);
     }
     let lastModified: DateTime | undefined;
     if (str !== null) {
@@ -351,7 +349,7 @@ class Downloader {
   private async _partialContent(record: Record, resp: Response) {
     const body = resp.body;
     if (!body) {
-      throw new Exception("body null");
+      throw new Error("body null");
     }
     await record.f.seek(0, Deno.SeekMode.End);
     for await (const b of body) {

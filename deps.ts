@@ -4,11 +4,11 @@ interface Dependency {
   mod: Array<string>;
 }
 
-function define(name: string, url: string, mod: Array<string>): Dependency {
+function define(name: string, url: string, mod?: Array<string>): Dependency {
   return {
     name: name,
     url: url,
-    mod: mod,
+    mod: mod ?? [],
   };
 }
 async function deps(output: string, ...deps: Array<Dependency>) {
@@ -26,6 +26,16 @@ async function deps(output: string, ...deps: Array<Dependency>) {
     console.log(`dependency: ${dep.name} from ${dep.url}`);
     const dir = `${output}${dep.name}`;
     await Deno.mkdir(dir, { recursive: true });
+
+    if (dep.url.startsWith("npm:")) {
+      console.log(` - mod.ts`);
+      await Deno.writeTextFile(
+        `${dir}/mod.ts`,
+        `export { default } from "${dep.url}";`,
+      );
+      return;
+    }
+
     for (const mode of dep.mod) {
       console.log(` - ${mode}`);
       const found = mode.lastIndexOf("/");
@@ -44,18 +54,21 @@ async function deps(output: string, ...deps: Array<Dependency>) {
 
 deps(
   "deps",
-  define("std", "https://deno.land/std@0.165.0", [
+  define("std", "https://deno.land/std@0.167.0", [
     "log/mod.ts",
     "testing/asserts.ts",
   ]),
   define(
     "easyts",
-    "https://raw.githubusercontent.com/powerpuffpenguin/easyts/0.0.18/deno",
+    "https://deno.land/x/easyts@0.1.0",
     [
-      "core/channel.ts",
-      "core/exception.ts",
-      "core/completer.ts",
-      "core/defer.ts",
+      "defer.ts",
+      "async.ts",
+      "channel.ts",
+      "exception.ts",
+      "net/url/mod.ts",
+      "context/mod.ts",
+      "io/mod.ts",
     ],
   ),
   define(
@@ -66,10 +79,21 @@ deps(
     ],
   ),
   define(
+    "gohttp",
+    "https://deno.land/x/gohttp@0.1.0",
+    [
+      "mod.ts",
+    ],
+  ),
+  define(
     "luxon",
     "https://cdn.jsdelivr.net/npm/luxon@3.1.0/build/es6",
     [
       "luxon.js",
     ],
+  ),
+  define(
+    "art-template",
+    "npm:art-template@^4.13.2",
   ),
 );

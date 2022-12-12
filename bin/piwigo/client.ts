@@ -1,6 +1,4 @@
-import { Exception } from "../../deps/easyts/core/exception.ts";
-import { Completer } from "../../deps/easyts/core/completer.ts";
-
+import { Completer } from "../../deps/easyts/async.ts";
 class Cookie {
   constructor(
     public readonly cookie: string,
@@ -74,12 +72,11 @@ export class Client {
     public readonly url: URL,
     public readonly username: string,
     public readonly password: string,
-  ) {
-  }
+  ) {}
   // deno-lint-ignore no-explicit-any
   private _checkResponse(obj: any) {
     if (obj["stat"] != "ok") {
-      throw new Exception(JSON.stringify(obj));
+      throw Error(JSON.stringify(obj));
     }
   }
   private async _login(): Promise<Cookie> {
@@ -100,7 +97,7 @@ export class Client {
       },
     });
     if (resp.status != 200) {
-      throw new Exception(`${resp.status}: ${resp.statusText}`);
+      throw new Error(`${resp.status}: ${resp.statusText}`);
     }
     const obj = await resp.json();
     this._checkResponse(obj);
@@ -109,7 +106,7 @@ export class Client {
     const tag = "pwg_id=";
     let found = str.indexOf(tag);
     if (found == -1) {
-      throw new Exception("not found pwg_id on set-cookie");
+      throw new Error("not found pwg_id on set-cookie");
     }
     str = str.substring(found + tag.length);
     found = str.indexOf(";");
@@ -120,9 +117,6 @@ export class Client {
   }
   private completer_?: Completer<Cookie>;
   async cookie(): Promise<Cookie | undefined> {
-    if (this.username == "" || this.password == "") {
-      return;
-    }
     let cookie = this.cookie_;
     if (cookie && cookie.isValid()) {
       return cookie;
