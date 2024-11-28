@@ -24,3 +24,4 @@
 *.sha256.txt
 
 /piwigo
+/get.sh

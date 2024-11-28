@@ -68,16 +68,24 @@ class Context {
     const names = new Set<string>();
     let page = 0;
     const limit = 100;
+    const u0 = this.client.url;
     while (true) {
       const resp = await client.getImages(id, page++, limit);
       const images = resp.result.images;
       if (!Array.isArray(images) || images.length == 0) {
         break;
       }
-      page++;
+
       for (const image of images) {
         const name = this._name(names, image.id, image.file);
         names.add(name);
+
+        const u = new URL(image.element_url);
+        if (u.protocol != u0.protocol || u.host != u0.host) {
+          u.protocol = u0.protocol;
+          u.host = u0.host;
+        }
+        image.element_url = u.toString();
 
         const old = keys.get(image.id);
         if (old) {
